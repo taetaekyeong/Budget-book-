@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="식비 가계부">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>식비 가계부</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1d22;--mu:#6b7280;--bd:#e3e6eb;--ac:#3b6cf6;--ok:#1f9d63;--bad:#e5484d;--wa:#d98a00;--okb:#e3f5ec;--badb:#fde8e9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2126;--tx:#eceef2;--mu:#9aa1ad;--bd:#2d3139;--ac:#6d93ff;--ok:#3ccf8e;--bad:#ff6b70;--wa:#f0b429;--okb:#173326;--badb:#3a1c1e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14161a;--card:#1e2126;--tx:#eceef2;--mu:#9aa1ad;--bd:#2d3139;--ac:#6d93ff;--ok:#3ccf8e;--bad:#ff6b70;--wa:#f0b429;--okb:#173326;--badb:#3a1c1e;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;line-height:1.45}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 14px}
+h2{font-size:14px;color:var(--mu);margin:0 0 10px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center;margin-bottom:8px}.row label{flex:1;font-size:14px}
+input,select,button{font:inherit;color:var(--tx)}
+input{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px}
+input[type=number]{width:120px;text-align:right}input[type=month],input[type=date]{width:150px}
+input[type=checkbox]{width:auto}
+.pair{display:flex;gap:6px;align-items:center}.pair input{width:90px}.pair span{color:var(--mu)}
+.stepper{display:flex;gap:6px}.stepper button{width:36px;height:36px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);font-size:18px}
+.btn{border:0;border-radius:10px;background:var(--ac);color:#fff;padding:9px 14px;font-weight:600;cursor:pointer}
+.btn.g{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}.btn.s{padding:5px 12px;font-size:12px}
+.note{font-size:12px;color:var(--mu);margin-top:4px}
+.big{font-size:30px;font-weight:700;line-height:1.2}.lab{font-size:13px;color:var(--mu)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--wa)}
+.bar{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;margin:10px 0 4px}.bar i{display:block;height:100%}
+.nav{display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.grid div{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mu)}
+.grid b{display:block;font-size:15px;color:var(--tx);margin-top:2px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dh{text-align:center;font-size:11px;color:var(--mu)}
+.cell{min-height:58px;border:1px solid var(--bd);border-radius:8px;padding:3px;font-size:10.5px;cursor:pointer;overflow:hidden;background:var(--bg)}
+.cell .n{font-size:10px;color:var(--mu)}.cell .v{margin-top:3px;word-break:keep-all;font-weight:600}
+.cell.ok{background:var(--okb);border-color:var(--ok)}.cell.over{background:var(--badb);border-color:var(--bad)}
+.cell.miss{border-style:dashed;border-color:var(--wa)}.cell.fut .v{color:var(--mu);font-weight:400}.cell.today{box-shadow:0 0 0 2px var(--ac)}
+.orow{display:grid;grid-template-columns:42px 1fr 78px 72px;gap:6px;padding:7px 4px;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer}
+.orow.cur{background:var(--bg);border-radius:8px}.orow.h{color:var(--mu);font-size:11px;cursor:default}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sh{background:var(--card);width:100%;max-width:560px;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto}
+.it{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.it button{border:0;background:none;color:var(--bad);font-size:18px}
+details summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--mu)}
+</style></head><body><main>
+<h1>📒 식비 가계부</h1>
+
+<div class="card"><details><summary id="sth">⚙ 설정</summary><div style="margin-top:10px">
+<div class="row"><label>총 예산</label><div class="stepper"><button id="bm">−</button><input id="budget" type="number" step="50000" min="0"><button id="bp">+</button></div></div>
+<div class="row"><label><input type="checkbox" id="carry"> 지난 주기 여유/초과를 예산에 반영(이월)</label></div>
+<div class="row"><label>주말 가중치 (평일 대비 배)</label><input id="k" type="number" step="0.05" min="0.1"></div>
+<div class="row"><label>월급날 (일, 전 주기 공통)</label><input id="pday" type="number" min="1" max="31"></div>
+<div class="note">월급날이 주말이면 직전 금요일로 당깁니다. 예산·가중치 등은 바꾼 주기부터 이후 주기에 적용되고, 이전 주기는 유지돼요.</div>
+<details style="margin-top:10px"><summary>고급: 몬테카를로 하루 식비 범위</summary><div style="margin-top:8px">
+<div class="row"><label>평일 하한~상한</label><div class="pair"><input id="wmin" type="number" step="500"><span>~</span><input id="wmax" type="number" step="500"></div></div>
+<div class="row"><label>주말 하한~상한</label><div class="pair"><input id="emin" type="number" step="500"><span>~</span><input id="emax" type="number" step="500"></div></div>
+<button class="btn g s" id="au">기록으로 자동 추정 (10~90%)</button><div class="note" id="asn"></div></div></details>
+</div></details></div>
+
+<div class="card" id="sum"></div>
+
+<div class="card"><div class="nav"><button class="btn g" id="pv">◀</button><div style="flex:1;text-align:center"><div class="big" style="font-size:20px" id="ct"></div><div class="note" id="per"></div></div><button class="btn g" id="nx">▶</button></div>
+<div style="display:flex;gap:8px;justify-content:center;align-items:center;margin:8px 0 10px"><button class="btn g s" id="tdy">이번 주기</button><input id="jm" type="month" style="width:140px" title="지출월로 이동"></div>
+<div class="cal" id="cal"></div>
+<div class="note">날짜를 누르면 입력합니다. 초록=일 기준액 이하 · 빨강=초과 · 점선=과거 미기입 · 회색 ≈=남은 날 권장액</div></div>
+
+<div class="card"><h2>연간 개요 (눌러서 이동)</h2>
+<div class="nav"><button class="btn g s" id="yp">◀</button><div style="flex:1;text-align:center;font-weight:700" id="ovy"></div><button class="btn g s" id="yn">▶</button></div>
+<div class="orow h" style="margin-top:8px"><span>지출월</span><span>사용 / 예산</span><span>잔액</span><span>무지출</span></div><div id="ovb"></div><div class="note" id="ovt"></div></div>
+
+<div class="card"><h2>저장 / 복원</h2>
+<div class="row"><button class="btn" id="sv" style="flex:1">💾 저장</button><button class="btn g" id="ld" style="flex:1">📂 불러오기</button></div>
+<div id="lg" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+<input type="file" id="fi" accept=".json" hidden>
+<div class="note" id="bs">저장하면 선택한 폴더 아래 log 폴더에 날짜_시간.json 파일이 만들어집니다. (Chrome·Edge로 로컬 파일을 열었을 때 지원 · 처음 한 번 이 HTML이 있는 폴더를 선택)</div>
+<div class="row" style="margin-top:8px"><label>log 보관 개수 (0=무제한)</label><input id="keep" type="number" min="0"></div>
+<button class="btn g s" id="fd">저장 폴더 다시 선택</button></div>
+
+<div class="ov" id="ov"><div class="sh">
+<div class="row"><b id="st" style="flex:1;font-size:16px"></b><button class="btn g" id="cl">닫기</button></div>
+<div id="items"></div>
+<div class="row" style="margin-top:10px"><input id="na" type="number" step="500" placeholder="금액" style="width:100px"><input id="nm" type="text" placeholder="메모 (점심, 커피…)" style="flex:1;min-width:0"><button class="btn" id="add">추가</button></div>
+<div class="row"><label><input type="checkbox" id="free"> 무지출 (이 날은 쓰지 않았어요)</label></div>
+</div></div>
+</main>
+<script>
+const $=id=>document.getElementById(id),pad=x=>String(x).padStart(2,'0'),dn='일월화수목금토';
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>new Date(s+'T00:00'),f=t=>`${t.getMonth()+1}/${t.getDate()}(${dn[t.getDay()]})`;
+const won=x=>Math.round(x).toLocaleString('ko-KR');
+const fm=a=>a>=10000?+(a/10000).toFixed(2)+'만':Math.round(a).toLocaleString('ko-KR');
+const sg=v=>(v>=0?'+':'−')+won(Math.abs(v))+'원'+(v>=0?' 여유':' 초과');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isWE=d=>d.getDay()%6==0,sum=e=>e?e.items.reduce((p,i)=>p+i.a,0):0,has=e=>!!e&&(e.free||e.items.length>0);
+const T=new Date();T.setHours(0,0,0,0);
+// 월급날이 주말이면 직전 금요일 (토 -1, 일 -2)
+const adj=(y,mo,d)=>{const dt=new Date(y,mo,Math.min(d,new Date(y,mo+1,0).getDate())),w=dt.getDay();if(w==6)dt.setDate(dt.getDate()-1);else if(w==0)dt.setDate(dt.getDate()-2);return dt};
+const DEF={budget:400000,k:1.2,wmin:7000,wmax:15000,emin:7000,emax:15000,carry:false};
+let G={pday:25,keep:30,def:{...DEF}},C={},T0={},E={};   // G=공통, C=주기별 설정, T0=주기 시작일 변경, E=기록
+function apply(o){
+ if(o.G){G=Object.assign({pday:25,keep:30,def:{...DEF}},o.G);C=o.C||{};T0=o.T0||{}}
+ else if(o.S){const s=o.S;G.pday=s.pday||25;G.def={...DEF};['budget','k','wmin','wmax','emin','emax'].forEach(i=>{if(s[i]!=null)G.def[i]=s[i]});C={};T0={}}
+ E=o.E||{}}
+try{const r=localStorage.getItem('ledger_v2')||localStorage.getItem('ledger_v1');if(r)apply(JSON.parse(r))}catch(x){}
+const save=()=>{try{localStorage.setItem('ledger_v2',JSON.stringify({G,C,T0,E}))}catch(x){}};
+// 주기 키 = 입금(월급) 월 'YYYY-MM'. 제목의 지출월 = 키 월 + 1
+const addM=(k,n)=>{const[y,m]=k.split('-').map(Number),b=new Date(y,m-1+n,1);return b.getFullYear()+'-'+pad(b.getMonth()+1)};
+const pd=()=>Math.min(31,Math.max(1,+G.pday||25));
+const cs0=k=>{const[y,m]=k.split('-').map(Number);return adj(y,m-1,pd())};
+const cs=cs0;
+const dys=k=>{const s=cs(k),e=cs(addM(k,1));e.setDate(e.getDate()-1);const a=[];for(let t=new Date(s);(t<=e||!a.length)&&a.length<400;t.setDate(t.getDate()+1))a.push(new Date(t));return a};
+const curKey=()=>{const y=T.getFullYear(),m=T.getMonth(),b=addM(y+'-'+pad(m+1),-2);for(let i=0;i<5;i++){const k=addM(b,i);if(cs(k)<=T&&T<cs(addM(k,1)))return k}return addM(y+'-'+pad(m+1),T<adj(y,m,pd())?-1:0)};
+const lblY=k=>+addM(k,1).slice(0,4);
+const cfg=k=>{let b=null;for(const q in C)if(q<=k&&(!b||q>b))b=q;return b?C[b]:G.def};  // 직전 설정 상속
+let M={};
+function cy(k,dep=0){if(M[k])return M[k];
+ const D=dys(k),c=cfg(k);let sp=0,rec=0,fr=0,carry=0;
+ D.forEach(d=>{const x=E[iso(d)];sp+=sum(x);if(has(x)){rec++;if(x.free)fr++}});
+ if(c.carry&&dep<36){const p=cy(addM(k,-1),dep+1);if(p.rec)carry=p.B-p.sp}
+ return M[k]={D,c,sp,rec,fr,carry,B:c.budget+carry}}
+const u=(a,b)=>{if(a>b)[a,b]=[b,a];return Math.round((a+Math.random()*(b-a))/100)*100};
+function mc(sp,wd,we,B,c){const N=5000,t=[];
+ for(let i=0;i<N;i++){let s=sp;for(let j=0;j<wd;j++)s+=u(c.wmin,c.wmax);for(let j=0;j<we;j++)s+=u(c.emin,c.emax);t.push(s)}
+ t.sort((a,b)=>a-b);return{p:t.filter(x=>x>B).length/N,lo:t[Math.floor(N*.05)],hi:t[Math.floor(N*.95)]}}
+let V=curKey(),ovY=lblY(V);
+const go=k=>{V=k;ovY=lblY(k);render()};
+const NUM=['budget','k','wmin','wmax','emin','emax'];
+function fill(c,k){const set=(i,v)=>{if(document.activeElement!==$(i))$(i).value=v};NUM.forEach(i=>set(i,c[i]));$('carry').checked=!!c.carry;set('pday',G.pday);set('keep',G.keep)}
+
+function render(){
+ M={};const k=V,s0=cy(k),D=s0.D,c=s0.c,B=s0.B,kk=+c.k||1;
+ const[y,mo]=k.split('-').map(Number),lb=new Date(y,mo,1);
+ $('ct').textContent=`${lb.getFullYear()}년 ${lb.getMonth()+1}월 지출`;
+ $('per').textContent=`${f(D[0])} 월급 ~ ${f(D[D.length-1])}`;
+ $('jm').value=lb.getFullYear()+'-'+pad(lb.getMonth()+1);fill(c,k);
+ const far=(D[0]-T)/864e5>35&&!s0.rec,WE=D.filter(isWE).length,WD=D.length-WE;
+ let pS=0,pN=0,rWD=0,rWE=0,miss=0;
+ D.forEach(d=>{const x=E[iso(d)];if(has(x)){if(d<=T){pS+=sum(x);pN++}}else if(d>=T){isWE(d)?rWE++:rWD++}else miss++});
+ const spent=s0.sp,R=B-spent,den=rWD+kk*rWE,w=den?R/den:0,w0=B/(WD+kk*WE),remN=rWD+rWE;
+ const recOf=d=>Math.max(0,isWE(d)?kk*w:w),baseOf=d=>isWE(d)?kk*w0:w0;
+ let h='';
+ if(far)h=`<div class="lab">먼 미래 주기</div><div class="big" style="font-size:18px">기록을 시작하면 권장액이 표시돼요</div>`;
+ else{
+  const nd=D.find(d=>d>=T&&!has(E[iso(d)])),m=remN?mc(spent,rWD,rWE,B,c):null;
+  const avg=pN?pS/pN:null,proj=avg==null?null:spent+avg*remN,diff=proj==null?null:B-proj;
+  if(nd)h+=`<div class="lab">${+nd===+T?'오늘':f(nd)} 권장 식비</div><div class="big ${R<0?'bad':''}">${won(recOf(nd))}원</div>
+  <div class="note">평일 ${won(Math.max(0,w))} · 주말 ${won(Math.max(0,kk*w))} (남은 ${remN}일: 평일 ${rWD} / 주말 ${rWE})</div>`;
+  else h+=`<div class="lab">${D[D.length-1]<T?'지난 기간 결과':'모두 기입됨'}</div><div class="big ${R<0?'bad':'ok'}">${sg(R)}</div>`;
+  h+=`<div class="bar"><i style="width:${Math.min(100,Math.max(0,spent/(B||1)*100))}%;background:var(${R<0?'--bad':'--ok'})"></i></div>
+  <div class="note">${won(spent)} / ${won(B)}원 사용 · 남은 예산 <b class="${R<0?'bad':''}">${won(R)}원</b>${c.carry?`<br>예산 = 기본 ${won(c.budget)} + 이월 ${s0.carry>=0?'+':'−'}${won(Math.abs(s0.carry))}`:''}</div>
+  <div class="grid"><div>기입일 평균<b>${avg==null?'-':won(avg)+'원'}</b></div>
+  <div>현재 페이스 예상 총액<b>${proj==null?'-':won(proj)+'원'}</b><span class="${diff<0?'bad':'ok'}">${diff==null?'':sg(diff)}</span></div>`;
+  if(m)h+=`<div>예산 초과 확률 (몬테카를로)<b class="${m.p>.5?'bad':m.p>.2?'warn':'ok'}">${(m.p*100).toFixed(1)}%</b></div><div>예상 총액 90% 구간<b>${fm(m.lo)} ~ ${fm(m.hi)}</b></div>`;
+  h+='</div>';
+  if(miss)h+=`<div class="note warn" style="margin-top:8px">⚠ 지난 미기입 ${miss}일 — 안 쓴 날은 '무지출'로 표시하세요. (현재 권장액엔 미반영)</div>`}
+ $('sum').innerHTML=h;
+ let q=[...dn].map(x=>`<div class="dh">${x}</div>`).join('')+'<div></div>'.repeat(D[0].getDay());
+ D.forEach((d,i)=>{const x=E[iso(d)],a=sum(x),cls=['cell'];let v='';
+  if(has(x)){v=x.free?'무지출':a.toLocaleString('ko-KR');cls.push(a<=baseOf(d)?'ok':'over')}
+  else if(d>=T){cls.push('fut');v=far?'':'≈'+fm(recOf(d))}
+  else{cls.push('miss');v='미기입'}
+  if(+d===+T)cls.push('today');
+  q+=`<div class="${cls.join(' ')}" data-d="${iso(d)}"><div class="n">${i==0?'💰':''}${i==0||d.getDate()==1?(d.getMonth()+1)+'/':''}${d.getDate()}${isWE(d)?'·주':''}</div><div class="v">${v}</div></div>`});
+ $('cal').innerHTML=q;
+ // 연간 개요
+ let rows='',tS=0,tB=0;
+ for(let m=1;m<=12;m++){const kk2=addM(ovY+'-'+pad(m),-1),s=cy(kk2),df=s.B-s.sp;if(s.rec){tS+=s.sp;tB+=s.B}
+  rows+=`<div class="orow${kk2===V?' cur':''}" data-k="${kk2}"><span>${m}월</span><span>${s.rec?won(s.sp)+' / '+fm(s.B):'-'}</span><b class="${df<0?'bad':'ok'}">${s.rec?(df>=0?'+':'−')+fm(Math.abs(df)):''}</b><span>${s.rec?s.fr+'일':''}</span></div>`}
+ $('ovy').textContent=ovY+'년';$('ovb').innerHTML=rows;$('ovt').textContent=tB?`기록 있는 주기 합계: 사용 ${won(tS)}원 / 예산 ${won(tB)}원 (${sg(tB-tS)})`:'이 해에는 기록이 없어요.'}
+
+// 설정 (바꾼 주기부터 적용)
+function setCfg(fld,val){C[V]=Object.assign({},cfg(V),{[fld]:val});save();render()}
+NUM.forEach(i=>$(i).addEventListener('input',()=>setCfg(i,+$(i).value)));
+$('carry').onchange=()=>setCfg('carry',$('carry').checked);
+$('bm').onclick=()=>setCfg('budget',Math.max(0,cfg(V).budget-50000));$('bp').onclick=()=>setCfg('budget',cfg(V).budget+50000);
+$('pday').addEventListener('input',()=>{G.pday=+$('pday').value;save();render()});
+$('keep').addEventListener('input',()=>{G.keep=+$('keep').value;save()});
+$('au').onclick=()=>{const wd=[],we=[];for(const d in E){const a=sum(E[d]);if(a>0)(isWE(parse(d))?we:wd).push(a)}
+ if(wd.length<5||we.length<3){$('asn').textContent='기록이 부족해요 (평일 5일·주말 3일 이상 필요).';return}
+ const p=(a,r)=>{a.sort((x,y)=>x-y);return Math.round(a[Math.floor(r*(a.length-1))]/500)*500};
+ C[V]=Object.assign({},cfg(V),{wmin:p(wd,.1),wmax:p(wd,.9),emin:p(we,.1),emax:p(we,.9)});save();render();$('asn').textContent=`평일 ${wd.length}일·주말 ${we.length}일 기록으로 추정했어요.`};
+// 이동
+$('pv').onclick=()=>go(addM(V,-1));$('nx').onclick=()=>go(addM(V,1));$('tdy').onclick=()=>go(curKey());
+$('jm').onchange=()=>{if($('jm').value)go(addM($('jm').value,-1))};
+$('yp').onclick=()=>{ovY--;render()};$('yn').onclick=()=>{ovY++;render()};
+$('ovb').onclick=ev=>{const r=ev.target.closest('.orow');if(r){go(r.dataset.k);scrollTo({top:0,behavior:'smooth'})}};
+
+// 입력 시트
+let cur=null;
+function sheet(){const d=parse(cur),x=E[cur]||{items:[],free:false};
+ $('st').textContent=f(d)+(isWE(d)?' · 주말':'');
+ $('items').innerHTML=x.items.map((it,i)=>`<div class="it"><span>${it.a.toLocaleString('ko-KR')}원 ${it.m?'· '+esc(it.m):''}</span><button data-i="${i}">×</button></div>`).join('')+(x.items.length?`<div class="it"><b>합계</b><b>${won(sum(x))}원</b></div>`:'');
+ $('free').checked=!!x.free;$('free').disabled=x.items.length>0}
+const clean=()=>{if(!has(E[cur]))delete E[cur];save();sheet();render()};
+$('cal').onclick=ev=>{const c=ev.target.closest('.cell');if(!c)return;cur=c.dataset.d;sheet();$('ov').style.display='flex';$('na').focus()};
+$('cl').onclick=()=>$('ov').style.display='none';
+$('ov').onclick=ev=>{if(ev.target.id==='ov')$('ov').style.display='none'};
+$('add').onclick=()=>{const a=Math.round(+$('na').value);if(!(a>0))return;
+ const x=E[cur]||(E[cur]={items:[],free:false});x.free=false;x.items.push({a,m:$('nm').value.trim()});$('na').value='';$('nm').value='';clean();$('na').focus()};
+['na','nm'].forEach(i=>$(i).addEventListener('keydown',ev=>{if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();if(Math.round(+$('na').value)>0){$('add').click();$('ov').style.display='none'}}}));
+document.addEventListener('keydown',ev=>{if($('ov').style.display!=='flex'||ev.code!=='KeyF'||ev.ctrlKey||ev.metaKey||ev.altKey||ev.target===$('nm'))return;
+ ev.preventDefault();if(E[cur]&&E[cur].items.length)return;
+ E[cur]={items:[],free:true};clean();$('ov').style.display='none'});
+$('items').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;E[cur].items.splice(+b.dataset.i,1);clean()};
+$('free').onchange=()=>{E[cur]={items:[],free:$('free').checked};clean()};
+
+// 저장 / 복원 (log 폴더)
+const stamp=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`};
+const say=t=>{$('bs').textContent=t};
+const fail=x=>say('실패: '+(x&&x.name==='AbortError'?'폴더 선택이 취소되었습니다.':(x&&x.message)||x));
+const idb=(m,fn)=>new Promise((res,rej)=>{const q=indexedDB.open('ledger_fs',1);q.onupgradeneeded=()=>q.result.createObjectStore('h');q.onsuccess=()=>{const tx=q.result.transaction('h',m),r=fn(tx.objectStore('h'));tx.oncomplete=()=>res(r.result);tx.onerror=()=>rej(tx.error)};q.onerror=()=>rej(q.error)});
+async function logDir(pick){
+ let h=null;if(!pick)try{h=await idb('readonly',s=>s.get('dir'))}catch(x){}
+ if(h){let p=await h.queryPermission({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission({mode:'readwrite'});if(p!=='granted')h=null}
+ if(!h){h=await showDirectoryPicker({mode:'readwrite'});try{await idb('readwrite',s=>s.put(h,'dir'))}catch(x){}}
+ return h.getDirectoryHandle('log',{create:true})}
+async function names(d){const L=[];for await(const[n,h]of d.entries())if(h.kind==='file'&&/^\d{4}-\d\d-\d\d_\d{6}\.json$/.test(n))L.push(n);return L.sort()}
+$('sv').onclick=async()=>{
+ const name=stamp()+'.json',txt=JSON.stringify({G,C,T0,E,savedAt:new Date().toISOString()},null,1);
+ try{
+  if(window.showDirectoryPicker){const d=await logDir(false),w=await(await d.getFileHandle(name,{create:true})).createWritable();await w.write(txt);await w.close();
+   let del=0;const n=+G.keep;if(n>0){const L=await names(d);for(const o of L.slice(0,Math.max(0,L.length-n))){await d.removeEntry(o);del++}}
+   say(`저장 완료: log/${name}`+(del?` (오래된 ${del}개 정리)`:''))}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;a.click();say(`${name} 다운로드됨 — HTML 옆 log 폴더로 옮겨 보관하세요. (이 브라우저는 폴더 직접 저장 미지원)`)}
+ }catch(x){fail(x)}};
+$('fd').onclick=async()=>{try{if(!window.showDirectoryPicker)throw new Error('이 브라우저는 폴더 선택을 지원하지 않아요.');await logDir(true);say('저장 폴더를 바꿨습니다.')}catch(x){fail(x)}};
+let LD=null;
+$('ld').onclick=async()=>{
+ try{
+  if(!window.showDirectoryPicker){$('fi').click();return}
+  LD=await logDir(false);const L=(await names(LD)).reverse();
+  $('lg').innerHTML=L.map(n=>`<button class="btn g" data-n="${n}">${n}</button>`).join('');
+  say(L.length?`log 폴더에 ${L.length}개 — 복원할 파일을 선택하세요. (최신순)`:'log 폴더에 저장된 파일이 없어요.')
+ }catch(x){fail(x)}};
+$('lg').onclick=async ev=>{const b=ev.target.closest('button');if(!b)return;try{const fl=await(await LD.getFileHandle(b.dataset.n)).getFile();restore(await fl.text(),b.dataset.n)}catch(x){fail(x)}};
+$('fi').onchange=async()=>{const fl=$('fi').files[0];if(fl)restore(await fl.text(),fl.name)};
+function restore(t,n){try{const o=JSON.parse(t);if(!o.E)throw 0;
+ try{localStorage.setItem('ledger_prev',JSON.stringify({G,C,T0,E}))}catch(x){}
+ apply(o);save();$('lg').innerHTML='';render();say(`복원 완료: ${n}`)}catch(x){say('형식이 올바르지 않은 파일이에요.')}}
+render();
+</script></body></html>
